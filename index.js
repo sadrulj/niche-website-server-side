@@ -41,7 +41,7 @@ async function run() {
     await client.connect();
     const database = client.db("makemyglassesDB");
     const productsCollection = database.collection("products");
-    const pruchaseCollection = database.collection("purchase");
+    const purchaseCollection = database.collection("purchase");
     const reviewsCollection = database.collection("reviews");
     const usersCollection = database.collection("users");
 
@@ -49,7 +49,6 @@ async function run() {
     app.get("/products", async (req, res) => {
       const cursor = productsCollection.find({});
       const products = await cursor.toArray();
-      console.log(products);
       res.send(products);
     });
     app.get("/products/:id", async (req, res) => {
@@ -69,6 +68,55 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await productsCollection.deleteOne(query);
+      console.log(result);
+      res.json(result);
+    });
+
+    app.get("/purchase", async (req, res) => {
+      const cursor = purchaseCollection.find({});
+      const purchase = await cursor.toArray();
+      res.send(purchase);
+    });
+
+    app.post("/purchase", async (req, res) => {
+      const purchase = req.body;
+      const result = await purchaseCollection.insertOne(purchase);
+      res.send(result);
+    });
+
+    app.get("/purchase/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await productsCollection.findOne(query);
+      console.log(result);
+      res.send(result);
+    });
+
+    app.get("/myOrders", async (req, res) => {
+      const cursor = purchaseCollection.find({});
+      const purchase = await cursor.toArray();
+      res.send(purchase);
+    });
+
+    app.get("/myOrders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await purchaseCollection.findOne(query);
+      console.log(result);
+      res.send(result);
+    });
+
+    app.get("/myOrders/:email", async (req, res) => {
+      const result = await purchaseCollection
+        .find({ email: req.params.email })
+        .toArray();
+      res.send(result);
+    });
+
+    app.delete("/myOrders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await purchaseCollection.deleteOne(query);
       console.log(result);
       res.json(result);
     });
