@@ -22,7 +22,6 @@ async function run() {
     await client.connect();
     const database = client.db("makemyglassesDB");
     const productsCollection = database.collection("products");
-    const purchaseCollection = database.collection("purchase");
     const ordersCollection = database.collection("orders");
     const reviewsCollection = database.collection("reviews");
     const usersCollection = database.collection("users");
@@ -49,75 +48,37 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await productsCollection.deleteOne(query);
-      console.log(result);
-      res.json(result);
-    });
-
-    app.get("/singleProduct/:id", async (req, res) => {
-      const result = await productsCollection
-        .find({ _id: ObjectId(req.params.id) })
-        .toArray();
-      res.send(result[0]);
-    });
-
-    app.post("orders", async (req, res) => {
-      const result = await ordersCollection.insertOne(req.body);
-      consloe.log(result);
       res.json(result);
     });
 
     app.get("/orders", async (req, res) => {
       const cursor = ordersCollection.find({});
       const orders = await cursor.toArray();
+      console.log(orders);
       res.send(orders);
     });
 
-    app.get("/purchase", async (req, res) => {
-      const cursor = purchaseCollection.find({});
-      const purchase = await cursor.toArray();
-      res.send(purchase);
-    });
-
-    app.post("/myOrders", async (req, res) => {
-      const purchase = req.body;
-      const result = await purchaseCollection.insertOne(purchase);
-      res.send(result);
-    });
-
-    app.get("/purchase/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await productsCollection.findOne(query);
+    app.post("/orders", async (req, res) => {
+      const order = req.body;
+      const result = await ordersCollection.insertOne(order);
       console.log(result);
       res.send(result);
     });
 
-    app.get("/myOrders", async (req, res) => {
-      const cursor = purchaseCollection.find({});
-      const purchase = await cursor.toArray();
-      res.send(purchase);
+    app.get("/orders/:email", async (req, res) => {
+      const email = req.params.email;
+
+      const query = { email: email };
+      console.log(query);
+      const cursor = ordersCollection.find(query);
+      const orders = await cursor.toArray();
+      res.json(orders);
     });
 
-    app.get("/myOrders/:id", async (req, res) => {
+    app.delete("/orders/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await purchaseCollection.findOne(query);
-      console.log(result);
-      res.send(result);
-    });
-
-    app.get("/myOrders/:email", async (req, res) => {
-      const result = await purchaseCollection
-        .find({ email: req.params.email })
-        .toArray();
-      res.send(result);
-    });
-
-    app.delete("/myOrders/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await purchaseCollection.deleteOne(query);
-      console.log(result);
+      const query = { _id: id };
+      const result = await ordersCollection.deleteOne(query);
       res.json(result);
     });
 
