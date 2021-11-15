@@ -1,18 +1,11 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-// const admin = require("firebase-admin");
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
 const ObjectId = require("mongodb").ObjectId;
 
 const port = process.env.PORT || 5000;
-
-// const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-// });
 
 app.use(cors());
 app.use(express.json());
@@ -24,28 +17,16 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
 });
 
-// async function verifyToken(req, res, next) {
-//   if (req.headers?.authorization?.startsWith("Bearer ")) {
-//     const token = req.headers.authorization.split(" ")[1];
-
-//     try {
-//       const decodedUser = await admin.auth().verifyIdToken(token);
-//       req.decodedEmail = decodedUser.email;
-//     } catch {}
-//   }
-//   next();
-// }
-
 async function run() {
   try {
     await client.connect();
     const database = client.db("makemyglassesDB");
     const productsCollection = database.collection("products");
     const purchaseCollection = database.collection("purchase");
+    const ordersCollection = database.collection("orders");
     const reviewsCollection = database.collection("reviews");
     const usersCollection = database.collection("users");
 
-    // verifyToken,
     app.get("/products", async (req, res) => {
       const cursor = productsCollection.find({});
       const products = await cursor.toArray();
@@ -55,7 +36,7 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await productsCollection.findOne(query);
-      res.json(result);
+      res.send(result);
     });
 
     app.post("/products", async (req, res) => {
@@ -72,13 +53,32 @@ async function run() {
       res.json(result);
     });
 
+    app.get("/singleProduct/:id", async (req, res) => {
+      const result = await productsCollection
+        .find({ _id: ObjectId(req.params.id) })
+        .toArray();
+      res.send(result[0]);
+    });
+
+    app.post("orders", async (req, res) => {
+      const result = await ordersCollection.insertOne(req.body);
+      consloe.log(result);
+      res.json(result);
+    });
+
+    app.get("/orders", async (req, res) => {
+      const cursor = ordersCollection.find({});
+      const orders = await cursor.toArray();
+      res.send(orders);
+    });
+
     app.get("/purchase", async (req, res) => {
       const cursor = purchaseCollection.find({});
       const purchase = await cursor.toArray();
       res.send(purchase);
     });
 
-    app.post("/purchase", async (req, res) => {
+    app.post("/myOrders", async (req, res) => {
       const purchase = req.body;
       const result = await purchaseCollection.insertOne(purchase);
       res.send(result);
@@ -150,19 +150,6 @@ async function run() {
       console.log(result);
       res.json(result);
     });
-
-    // app.put("/users", async (req, res) => {
-    //   const user = req.body;
-    //   const filter = { email: user.email };
-    //   const options = { upsert: true };
-    //   const updateDoc = { $set: user };
-    //   const result = await usersCollection.updateOne(
-    //     filter,
-    //     updateDoc,
-    //     options
-    //   );
-    //   res.json(result);
-    // });
 
     app.put("/users/admin", async (req, res) => {
       const user = req.body;
