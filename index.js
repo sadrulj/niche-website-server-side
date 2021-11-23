@@ -31,10 +31,11 @@ async function run() {
       const products = await cursor.toArray();
       res.send(products);
     });
-    app.get("/products/:id", async (req, res) => {
+    app.get("/product/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await productsCollection.findOne(query);
+      console.log(query);
       res.send(result);
     });
 
@@ -54,31 +55,37 @@ async function run() {
     app.get("/orders", async (req, res) => {
       const cursor = ordersCollection.find({});
       const orders = await cursor.toArray();
-      console.log(orders);
       res.send(orders);
     });
 
     app.post("/orders", async (req, res) => {
       const order = req.body;
       const result = await ordersCollection.insertOne(order);
-      console.log(result);
       res.send(result);
     });
 
-    app.get("/orders/:email", async (req, res) => {
-      const email = req.params.email;
+    // app.get("/orders/:email", async (req, res) => {
+    //   const email = req.params.email;
+    //   const query = { email: email };
+    //   console.log(query);
+    //   const cursor = ordersCollection.find(query);
+    //   const orders = await cursor.toArray();
+    //   res.json(orders);
+    // });
 
-      const query = { email: email };
-      console.log(query);
-      const cursor = ordersCollection.find(query);
-      const orders = await cursor.toArray();
-      res.json(orders);
+    app.get("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await ordersCollection.findOne(query);
+      res.send(result);
     });
 
     app.delete("/orders/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: id };
+      const query = { _id: ObjectId(id) };
+      console.log(id);
       const result = await ordersCollection.deleteOne(query);
+      console.log(result);
       res.json(result);
     });
 
