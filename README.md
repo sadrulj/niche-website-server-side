@@ -5,12 +5,12 @@ This project was Project on eyewear glass. Name Make My Glasses
 ## Available GitLink:
 
 Heroku Live Site Link:
-https://obscure-temple-56874.herokuapp.com/
+
 
 
 
 Server side gitlink:
-https://github.com/programming-hero-web-course-4/niche-website-server-side-sadrulj
+https://github.com/sadrulj/niche-website-server-side
 
 Description on project:
 
